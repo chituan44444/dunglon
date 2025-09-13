@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Tool Tài Xỉu - VIP Access</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Robot style */
+    #robot {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 120px;
+      height: auto;
+      cursor: grab;
+      z-index: 1000;
+      display: none; /* Ẩn ban đầu */
+      transition: transform 0.1s ease;
+    }
+    #robot.dragging {
+      cursor: grabbing;
+      opacity: 0.8;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center justify-start py-10">
+
+  <!-- VIP Key Screen -->
+  <div id="vipScreen" class="w-full max-w-md bg-white rounded-2xl shadow-lg p-6 text-center">
+    <h1 class="text-2xl font-bold text-indigo-600 mb-4">ĐĂNG NHẬP HỆ THỐNG</h1>
+    <p class="mb-4 text-gray-700">Vui lòng nhập mã truy cập VIP để tiếp tục</p>
+    <input id="vipKeyInput" type="text" placeholder="Nhập mã truy cập của bạn" class="w-full border p-2 rounded mb-4">
+    <button onclick="checkVIPKey()" class="w-full bg-indigo-600 text-white py-2 rounded-lg mb-4">XÁC NHẬN</button>
+    <p class="text-gray-600">Nếu bạn chưa có mã truy cập VIP</p>
+    <a href="tel:0123456789" class="text-indigo-600 font-bold">LIÊN HỆ ADMIN</a>
+  </div>
+
+  <!-- Tool Main Screen -->
+  <div id="toolScreen" class="hidden flex flex-col items-center w-full max-w-2xl space-y-4">
+    <h1 class="text-2xl font-bold text-indigo-600 mb-6">Tool Tài Xỉu — VIP</h1>
+
+    <!-- Game Buttons -->
+    <div class="flex space-x-4">
+      <button onclick="showRobot()" class="px-4 py-2 bg-indigo-600 text-white rounded-lg">SUN WIN</button>
+      <button onclick="showRobot()" class="px-4 py-2 bg-indigo-600 text-white rounded-lg">Luckywin</button>
+      <button onclick="showRobot()" class="px-4 py-2 bg-indigo-600 text-white rounded-lg">HITCLUB</button>
+      <button onclick="showRobot()" class="px-4 py-2 bg-indigo-600 text-white rounded-lg">B52</button>
+    </div>
+  </div>
+
+  <!-- Robot -->
+  <img id="robot" src="https://iqai.com/_next/image?url=/gifs/home/robotics.gif&w=828&q=75" alt="Robot IQAI">
+
+  <script>
+    const validKeys = ["VIP123","VIP456","VIP789"]; // danh sách key hợp lệ
+
+    function showVIPScreen() {
+      document.getElementById("vipScreen").classList.remove("hidden");
+      document.getElementById("toolScreen").classList.add("hidden");
+    }
+
+    function showToolScreen() {
+      document.getElementById("vipScreen").classList.add("hidden");
+      document.getElementById("toolScreen").classList.remove("hidden");
+    }
+
+    function checkVIPKey() {
+      const key = document.getElementById("vipKeyInput").value.trim();
+      if(validKeys.includes(key)) {
+        localStorage.setItem("vipKey", key);
+        showToolScreen();
+      } else {
+        alert("Mã VIP không hợp lệ!");
+      }
+    }
+
+    // Khi load trang, kiểm tra key
+    window.onload = () => {
+      const key = localStorage.getItem("vipKey");
+      if(key && validKeys.includes(key)) {
+        showToolScreen();
+      } else {
+        showVIPScreen();
+      }
+    };
+
+    // Hiển thị robot khi bấm vào game
+    function showRobot() {
+      const robot = document.getElementById("robot");
+      robot.style.display = "block";
+    }
+
+    /* Robot đi theo chuột và kéo */
+    const robot = document.getElementById("robot");
+    let isDragging = false;
+    let offsetX, offsetY;
+
+    robot.addEventListener("mousedown", (e) => {
+      isDragging = true;
+      offsetX = e.clientX - robot.getBoundingClientRect().left;
+      offsetY = e.clientY - robot.getBoundingClientRect().top;
+      robot.classList.add("dragging");
+    });
+
+    document.addEventListener("mouseup", () => {
+      isDragging = false;
+      robot.classList.remove("dragging");
+    });
+
+    document.addEventListener("mousemove", (e) => {
+      if(isDragging){
+        robot.style.left = e.clientX - offsetX + "px";
+        robot.style.top = e.clientY - offsetY + "px";
+      } else {
+        // Robot đi theo chuột nhưng chỉ vuốt lên/xuống
+        let robotRect = robot.getBoundingClientRect();
+        let centerX = robotRect.left + robotRect.width/2;
+        let centerY = robotRect.top + robotRect.height/2;
+        let dy = e.clientY - centerY;
+        robot.style.top = robotRect.top + dy*0.05 + "px"; // vuốt mượt
+      }
+    });
+  </script>
+
+</body>
+</html>
